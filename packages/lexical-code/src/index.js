@@ -461,6 +461,17 @@ function updateCodeGutter(node: CodeNode, editor: LexicalEditor): void {
   let count = 1;
   for (let i = 0; i < childrenLength; i++) {
     if ($isLineBreakNode(children[i])) {
+      // Avoid serial number dislocation for line feed
+      if (i) {
+        const element = editor.getElementByKey(children[i - 1].getKey());
+        const offsetHeight = element.offsetHeight;
+        const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+        const lineCount = Math.ceil(offsetHeight / lineHeight);
+
+        for (let index = 1; index < lineCount; index++) {
+          gutter += '\n';
+        }
+      }
       gutter += '\n' + ++count;
     }
   }
